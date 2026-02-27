@@ -51,4 +51,4 @@ Included sample Windows Security log file for practice.
 ---
 
 ## 👩‍💻 Author
-Jasmeen
+Rushikesh Pawar
