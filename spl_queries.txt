@@ -1,0 +1,106 @@
+==============================
+Windows SOC Monitoring - SPL Queries
+==============================
+
+--------------------------------------------------
+1. View All Logs
+--------------------------------------------------
+index=windows
+| head 20
+
+
+--------------------------------------------------
+2. Total Failed Login Attempts (Event ID 4625)
+--------------------------------------------------
+index=windows EventCode=4625
+| stats count as "Total Failed Logins"
+
+
+--------------------------------------------------
+3. Failed Login Trend (Time-Based Analysis)
+--------------------------------------------------
+index=windows EventCode=4625
+| timechart count as "Failed Login Trend"
+
+
+--------------------------------------------------
+4. Suspicious IP - Brute Force Detection
+--------------------------------------------------
+index=windows EventCode=4625
+| stats count by SourceIP
+| where count > 5
+| sort -count
+
+
+--------------------------------------------------
+5. Suspicious User Detection
+--------------------------------------------------
+index=windows EventCode=4625
+| stats count by User
+| where count > 5
+| sort -count
+
+
+--------------------------------------------------
+6. Check Successful Logins (Event ID 4624)
+--------------------------------------------------
+index=windows EventCode=4624
+| stats count by User
+
+
+--------------------------------------------------
+7. Failed + Successful Login Correlation
+--------------------------------------------------
+index=windows (EventCode=4625 OR EventCode=4624)
+| stats count by User, EventCode
+| sort User
+
+
+--------------------------------------------------
+8. New Process Created (Event ID 4688)
+--------------------------------------------------
+index=windows EventCode=4688
+| stats count by ProcessName
+| sort -count
+
+
+--------------------------------------------------
+9. PowerShell Execution Monitoring
+--------------------------------------------------
+index=windows EventCode=4688 ProcessName="powershell.exe"
+| stats count by User
+
+
+--------------------------------------------------
+10. Detailed PowerShell Activity View
+--------------------------------------------------
+index=windows EventCode=4688 ProcessName="powershell.exe"
+| table _time User SourceIP ProcessName
+
+
+--------------------------------------------------
+11. Detect Multiple Failed Logins from Same IP
+--------------------------------------------------
+index=windows EventCode=4625
+| stats count by SourceIP
+| where count > 10
+
+
+--------------------------------------------------
+12. Detect Multiple Failed Logins for Same User
+--------------------------------------------------
+index=windows EventCode=4625
+| stats count by User
+| where count > 10
+
+
+--------------------------------------------------
+13. Daily Failed Login Summary
+--------------------------------------------------
+index=windows EventCode=4625
+| timechart span=1d count as "Daily Failed Logins"
+
+
+==============================
+End of File
+==============================
